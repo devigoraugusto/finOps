@@ -4,6 +4,8 @@ using StackExchange.Redis;
 using finOps.Application.Interfaces;
 using finOps.Infra.Cache.Repositories;
 using finOps.Core.Entities;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +19,10 @@ builder.Services.AddCors(options =>
               .AllowAnyMethod();
     });
 });
+
+builder.Services.AddControllers()
+    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<CompanyValidator>())
+    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<InvoiceValidator>());
 
 var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL")
     ?? builder.Configuration.GetConnectionString("DefaultConnection");
