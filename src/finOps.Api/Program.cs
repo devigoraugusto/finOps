@@ -18,12 +18,16 @@ builder.Services.AddCors(options =>
     });
 });
 
+var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL")
+    ?? builder.Configuration.GetConnectionString("DefaultConnection");
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(connectionString));
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 {
-    var redisConfiguration = builder.Configuration.GetConnectionString("Redis");
+    var redisConfiguration = Environment.GetEnvironmentVariable("REDIS_URL")
+        ?? builder.Configuration.GetConnectionString("Redis");
     return ConnectionMultiplexer.Connect(redisConfiguration);
 });
 
