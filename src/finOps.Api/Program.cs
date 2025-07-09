@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using finOps.Infra.Persistence.EF;
+using StackExchange.Redis;
+using finOps.Application.Interfaces;
+using finOps.Infra.Cache.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +19,15 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+{
+    var redisConfiguration = builder.Configuration.GetConnectionString("Redis");
+    return ConnectionMultiplexer.Connect(redisConfiguration);
+});
+
+//builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
+builder.Services.AddScoped<ICartCacheRepository, CartCacheRepository>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
