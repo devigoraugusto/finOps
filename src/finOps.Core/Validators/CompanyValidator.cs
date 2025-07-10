@@ -1,5 +1,6 @@
 using FluentValidation;
 using finOps.Core.Entities;
+using finOps.Core.Enums;
 
 public class CompanyValidator : AbstractValidator<Company>
 {
@@ -17,7 +18,8 @@ public class CompanyValidator : AbstractValidator<Company>
             .NotEmpty().WithMessage("Monthly billing is required.")
             .GreaterThan(0).WithMessage("Monthly billing must be positive.");
 
-        RuleFor(company => company.Industry)
-            .IsInEnum().WithMessage("Industry must be a valid enum value.");
+        RuleFor(company => company.BusinessType)
+            .IsInEnum()
+            .WithMessage("Business type must be a valid enum value.");
     }
 }

@@ -1,4 +1,4 @@
-using finOps.Application.Interfaces;
+using finOps.Application.Interfaces.Repositories;
 using finOps.Core.Cache;
 using Microsoft.Extensions.Configuration;
 using StackExchange.Redis;

@@ -27,7 +27,7 @@ namespace finOps.Infra.Migrations
 
             modelBuilder.Entity("finOps.Core.Entities.Company", b =>
                 {
-                    b.Property<Guid>("GuidId")
+                    b.Property<Guid>("Guid")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
@@ -57,14 +57,14 @@ namespace finOps.Infra.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("GuidId");
+                    b.HasKey("Guid");
 
                     b.ToTable("Companies");
                 });
 
             modelBuilder.Entity("finOps.Core.Entities.Invoice", b =>
                 {
-                    b.Property<Guid>("GuidId")
+                    b.Property<Guid>("Guid")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
@@ -92,7 +92,7 @@ namespace finOps.Infra.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("GuidId");
+                    b.HasKey("Guid");
 
                     b.HasIndex("CompanyGuid");
 

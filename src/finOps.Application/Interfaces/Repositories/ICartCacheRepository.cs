@@ -1,6 +1,6 @@
 using finOps.Core.Cache;
 
-namespace finOps.Application.Interfaces
+namespace finOps.Application.Interfaces.Repositories
 {
     public interface ICartCacheRepository
     {

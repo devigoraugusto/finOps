@@ -15,7 +15,7 @@ namespace finOps.Infra.Migrations
                 name: "Companies",
                 columns: table => new
                 {
-                    GuidId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Guid = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     DocumentNumber = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     MonthlyBilling = table.Column<string>(type: "text", nullable: false),
@@ -26,14 +26,14 @@ namespace finOps.Infra.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Companies", x => x.GuidId);
+                    table.PrimaryKey("PK_Companies", x => x.Guid);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Invoices",
                 columns: table => new
                 {
-                    GuidId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Guid = table.Column<Guid>(type: "uuid", nullable: false),
                     CompanyGuid = table.Column<Guid>(type: "uuid", nullable: false),
                     Amount = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
                     IssueDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -45,12 +45,12 @@ namespace finOps.Infra.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Invoices", x => x.GuidId);
+                    table.PrimaryKey("PK_Invoices", x => x.Guid);
                     table.ForeignKey(
                         name: "FK_Invoices_Companies_CompanyGuid",
                         column: x => x.CompanyGuid,
                         principalTable: "Companies",
-                        principalColumn: "GuidId",
+                        principalColumn: "Guid",
                         onDelete: ReferentialAction.Cascade);
                 });
 

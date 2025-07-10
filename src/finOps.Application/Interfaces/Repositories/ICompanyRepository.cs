@@ -1,6 +1,6 @@
 using finOps.Core.Entities;
 
-namespace finOps.Application.Interfaces
+namespace finOps.Application.Interfaces.Repositories
 {
     public interface ICompanyRepository
     {

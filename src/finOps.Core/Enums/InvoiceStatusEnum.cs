@@ -1,6 +1,6 @@
 namespace finOps.Core.Enums
 {
-    public enum EnumInvoiceStatus
+    public enum InvoiceStatusEnum
     {
         Paid = 1,
         Unpaid = 2,

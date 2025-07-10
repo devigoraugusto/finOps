@@ -1,4 +1,4 @@
-using finOps.Application.Interfaces;
+using finOps.Application.Interfaces.Repositories;
 using finOps.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,7 +17,7 @@ namespace finOps.Infra.Persistence.EF
         {
             return await _context.Companies
                 .Include(c => c.Invoices)
-                .FirstOrDefaultAsync(c => c.GuidId == companyGuid);
+                .FirstOrDefaultAsync(c => c.Guid == companyGuid);
         }
 
         public async Task<IEnumerable<Company>> GetAllAsync()
@@ -41,7 +41,7 @@ namespace finOps.Infra.Persistence.EF
 
         public Task DeleteAsync(Guid companyGuid)
         {
-            _context.Companies.Remove(new Company { GuidId = companyGuid });
+            _context.Companies.Remove(new Company { Guid = companyGuid });
             return _context.SaveChangesAsync();
         }
     }
