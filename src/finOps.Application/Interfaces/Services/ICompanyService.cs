@@ -5,10 +5,11 @@ namespace finOps.Application.Interfaces.Services
 {
     public interface ICompanyService
     {
-        Task<CompanyDto> GetByGuidAsync(Guid companyGuid);
+        Task<Company> GetByGuidAsync(Guid companyGuid);
         Task<IEnumerable<CompanyDto>> GetAllAsync();
-        Task<CompanyDto> CreateAsync(CompanyDto companyDto);
-        Task UpdateAsync(CompanyDto companyDto);
+        Task<Company> CreateAsync(CompanyDto companyDto);
+        Task UpdateAsync(Company company);
         Task DeleteAsync(Guid companyGuid);
+        decimal CalculateLimit(Company company);
     }
 }

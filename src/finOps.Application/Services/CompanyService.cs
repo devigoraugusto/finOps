@@ -17,17 +17,17 @@ public class CompanyService : ICompanyService
         _companyRepository = companyRepository;
     }
 
-    public async Task<CompanyDto> GetByGuidAsync(Guid companyGuid)
+    public async Task<Company> GetByGuidAsync(Guid companyGuid)
     {
-        var company = await _companyRepository.GetByGuidAsync(companyGuid);
-        return new CompanyDto
+        var company = await _companyRepository.GetByGuidAsync(companyGuid) ?? throw new Exception("Company not found.");
+
+        return new Company
         {
             Guid = company.Guid,
             DocumentNumber = company.DocumentNumber,
             Name = company.Name,
             MonthlyBilling = company.MonthlyBilling,
-            BusinessType = company.BusinessType.ToString(),
-            Limit = CalculateLimit(company)
+            BusinessType = company.BusinessType,
         };
     }
 
@@ -45,7 +45,7 @@ public class CompanyService : ICompanyService
         });
     }
 
-    public async Task<CompanyDto> CreateAsync(CompanyDto companyDto)
+    public async Task<Company> CreateAsync(CompanyDto companyDto)
     {
         var company = new Company
         {
@@ -57,19 +57,11 @@ public class CompanyService : ICompanyService
         };
 
         await _companyRepository.AddAsync(company);
-        
-        return new CompanyDto
-        {
-            Guid = company.Guid,
-            DocumentNumber = company.DocumentNumber,
-            Name = company.Name,
-            MonthlyBilling = company.MonthlyBilling,
-            BusinessType = company.BusinessType.ToString(),
-            Limit = CalculateLimit(company)
-        };
+
+        return company;
     }
 
-    public async Task UpdateAsync(CompanyDto companyDto)
+    public async Task UpdateAsync(Company companyDto)
     {
         var company = new Company
         {
@@ -77,7 +69,7 @@ public class CompanyService : ICompanyService
             DocumentNumber = companyDto.DocumentNumber,
             Name = companyDto.Name,
             MonthlyBilling = companyDto.MonthlyBilling,
-            BusinessType = Enum.Parse<BusinessTypeEnum>(companyDto.BusinessType)
+            BusinessType = companyDto.BusinessType
         };
 
         await _companyRepository.UpdateAsync(company);
@@ -88,7 +80,7 @@ public class CompanyService : ICompanyService
         await _companyRepository.DeleteAsync(companyGuid);
     }
 
-    private decimal CalculateLimit(Company company)
+    public decimal CalculateLimit(Company company)
     {
         var bill = company.MonthlyBilling;
         var BusinessType = company.BusinessType;

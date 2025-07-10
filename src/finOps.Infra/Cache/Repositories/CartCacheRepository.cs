@@ -2,7 +2,6 @@ using finOps.Application.Interfaces.Repositories;
 using finOps.Core.Cache;
 using Microsoft.Extensions.Configuration;
 using StackExchange.Redis;
-using System.ComponentModel;
 using System.Text.Json;
 
 namespace finOps.Infra.Cache.Repositories

@@ -58,8 +58,9 @@ public class CompanyController : ControllerBase
             _carts[companyGuid] = new List<Invoice>();
 
         var cart = _carts[companyGuid];
+        var limit = _companyService.CalculateLimit(company);
         var totalBruto = cart.Sum(x => x.Amount) + invoice.Amount;
-        if (totalBruto > company.Limit)
+        if (totalBruto > limit)
             return BadRequest("Limite de crédito excedido.");
 
         cart.Add(invoice);

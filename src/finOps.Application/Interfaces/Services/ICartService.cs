@@ -1,12 +1,13 @@
 using finOps.Application.DTOs;
+using finOps.Core.Cache;
 
 namespace finOps.Application.Interfaces.Services
 {
     public interface ICartService
     {
-        Task<CartDto> GetCartAsync(Guid companyGuid);
-        Task<CartDto> CreateCartAsync(Guid companyGuid, CartDto cartDto);
-        Task<CartDto> UpdateCartAsync(Guid companyGuid, CartDto cartDto);
-        Task<bool> DeleteCartAsync(Guid companyGuid);
+        Task<CartCache> GetCartAsync(Guid companyGuid);
+        Task<CartCache> CreateCartAsync(Guid companyGuid);
+        Task UpdateCartAsync(CartCache cart);
+        Task DeleteCartAsync(Guid companyGuid);
     }
 }

@@ -1,5 +1,7 @@
 using finOps.Application.Interfaces.Services;
-using finOps.Application.Services;
+using finOps.Core.Entities;
+using finOps.Application.DTOs;
+using finOps.Core.Enums;
 
 namespace finOps.Application.Services
 {
@@ -18,70 +20,80 @@ namespace finOps.Application.Services
         {
             var company = await _companyService.GetByGuidAsync(companyGuid);
             if (company == null) throw new Exception("Company not found.");
-            var invoice = company.Invoices.FirstOrDefault(i => i.GuidId == invoiceGuid);
+            var invoice = company.Invoices.FirstOrDefault(i => i.Guid == invoiceGuid);
             if (invoice == null) throw new Exception("Invoice not found in the specified company.");
 
             return new InvoiceDto
             {
-                GuidId = invoice.GuidId,
-                CompanyGuid = companyGuid,
+                Number = invoice.InvoiceNumber,
                 Amount = invoice.Amount,
-                Date = invoice.Date
+                DueDate = invoice.DueDate
             };
         }
 
-        public async Task<InvoiceDto> CreateInvoiceAsync(Guid companyGuid, InvoiceDto invoiceDto)
+        public async Task<Invoice> CreateInvoiceAsync(Guid companyGuid, InvoiceDto invoiceDto)
         {
             var company = await _companyService.GetByGuidAsync(companyGuid);
             if (company == null) throw new Exception("Company not found.");
 
             var newInvoice = new Invoice
             {
-                GuidId = invoiceDto.GuidId,
+                Guid = Guid.NewGuid(),
                 CompanyGuid = companyGuid,
+                InvoiceNumber = invoiceDto.Number,
                 Amount = invoiceDto.Amount,
-                Date = invoiceDto.Date
+                DueDate = invoiceDto.DueDate,
+                IssueDate = DateTime.UtcNow,
+                Status = InvoiceStatusEnum.Unpaid,
             };
 
             company.Invoices.Add(newInvoice);
-            await _companyService.UpdateCompanyAsync(company);
+            await _companyService.UpdateAsync(company);
 
-            return invoiceDto;
+            return newInvoice;
         }
 
-        public async Task<InvoiceDto> UpdateInvoiceAsync(Guid companyGuid, InvoiceDto invoiceDto)
+        public async Task<Invoice> UpdateInvoiceAsync(Guid companyGuid, Invoice invoice)
         {
             var company = await _companyService.GetByGuidAsync(companyGuid);
             if (company == null) throw new Exception("Company not found.");
-            var invoice = company.Invoices.FirstOrDefault(i => i.GuidId == invoiceDto.GuidId);
-            if (invoice == null) throw new Exception("Invoice not found in the specified company.");
+            var beforeInvoice = company.Invoices.FirstOrDefault(i => i.Guid == invoice.Guid);
+            if (beforeInvoice == null) throw new Exception("Invoice not found in the specified company.");
 
-            invoice.Amount = invoiceDto.Amount;
-            invoice.Date = invoiceDto.Date;
+            beforeInvoice.Amount = invoice.Amount;
+            beforeInvoice.DueDate = invoice.DueDate;
 
-            await _companyService.UpdateCompanyAsync(company);
+            await _companyService.UpdateAsync(company);
 
-            return invoiceDto;
+            return invoice;
         }
 
         public async Task<bool> DeleteInvoiceAsync(Guid companyGuid, Guid invoiceGuid)
         {
             var company = await _companyService.GetByGuidAsync(companyGuid);
             if (company == null) throw new Exception("Company not found.");
-            var invoice = company.Invoices.FirstOrDefault(i => i.GuidId == invoiceGuid);
+            var invoice = company.Invoices.FirstOrDefault(i => i.Guid == invoiceGuid);
             if (invoice == null) throw new Exception("Invoice not found in the specified company.");
 
             company.Invoices.Remove(invoice);
-            await _companyService.UpdateCompanyAsync(company);
+            await _companyService.UpdateAsync(company);
 
             return true;
         }
 
-        public async Task ValidateInvoiceAsync(Invoice invoice)
+        public void ValidateInvoice(Invoice invoice)
         {
             if (invoice == null) throw new ArgumentNullException(nameof(invoice), "Invoice cannot be null.");
             if (invoice.Amount <= 0) throw new ArgumentException("Invoice amount must be greater than zero.", nameof(invoice.Amount));
-            if (invoice.Date == default) throw new ArgumentException("Invoice date is not valid.", nameof(invoice.Date));
+            if (invoice.DueDate == default) throw new ArgumentException("Invoice date is not valid.", nameof(invoice.DueDate));
+            if (invoice.IssueDate > DateTime.UtcNow)
+            {
+                throw new ArgumentException("Invoice issue date cannot be in the future.", nameof(invoice.IssueDate));
+            }
+            if (invoice.DueDate < invoice.IssueDate)
+            {
+                throw new ArgumentException("Invoice due date cannot be earlier than the issue date.", nameof(invoice.DueDate));
+            }
         }
     }
 }

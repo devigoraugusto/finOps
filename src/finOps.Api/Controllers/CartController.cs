@@ -1,4 +1,5 @@
 using finOps.Application.Interfaces;
+using finOps.Application.Interfaces.Services;
 using finOps.Core.Cache;
 using Microsoft.AspNetCore.Mvc;
 
@@ -32,10 +33,10 @@ public class CartController : ControllerBase
     [HttpPost("{companyGuid}")]
     public async Task<IActionResult> AddToCart(Guid companyGuid, [FromBody] Guid InvoiceGuid)
     {
-        var company = await _companyService.GetCompanyByIdAsync(companyGuid);
+        var company = await _companyService.GetByGuidAsync(companyGuid);
         if (company == null) return NotFound("Company not found.");
 
-        var invoice = company.Invoices.FirstOrDefault(i => i.GuidId == InvoiceGuid);
+        var invoice = company.Invoices.FirstOrDefault(i => i.Guid == InvoiceGuid);
         if (invoice == null) return NotFound("Invoice not found in the specified company.");
 
         try {
@@ -45,14 +46,12 @@ public class CartController : ControllerBase
             return BadRequest($"Invalid invoice data: {ex.Message}");
         }
 
-        var cart = await CartCache { CompanyGuid = companyGuid };
-        if (cart == null)
-            cart = await _cartService.GetCartAsync(companyGuid);
+        var cart = await _cartService.GetCartAsync(companyGuid);
 
         if (cart == null)
             return BadRequest("Invalid cart data.");
 
-        var createdCart = await _cartService.CreateCartAsync(companyGuid, cartDto);
+        var createdCart = await _cartService.CreateCartAsync(companyGuid);
         return CreatedAtAction(nameof(GetCart), new { companyGuid = createdCart.CompanyGuid }, createdCart);
     }
 

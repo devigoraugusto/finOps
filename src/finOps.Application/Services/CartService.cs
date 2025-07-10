@@ -1,52 +1,44 @@
 using finOps.Application.Interfaces.Services;
 using finOps.Application.DTOs;
+using finOps.Core.Cache;
+using finOps.Application.Interfaces.Repositories;
 
 namespace finOps.Application.Services
 {
     public class CartService : ICartService
     {
-        private readonly ICartService _cartService;
+        private readonly ICartCacheRepository _cartRepository;
         private readonly ICompanyService _companyService;
         private readonly IInvoiceService _invoiceService;
 
-        public CartService(ICartService cartService, ICompanyService companyService, IInvoiceService invoiceService)
+        public CartService(ICartCacheRepository cartCacheRepository, ICompanyService companyService, IInvoiceService invoiceService)
         {
-            _cartService = cartService;
+            _cartRepository = cartCacheRepository;
             _companyService = companyService;
             _invoiceService = invoiceService;
         }
 
-        public async Task<CartDto> GetCartAsync(Guid companyGuid)
+        public async Task<CartCache> GetCartAsync(Guid companyGuid)
         {
-            return await _cartService.GetCartAsync(companyGuid);
+            return await _cartRepository.GetCartCacheAsync(companyGuid);
         }
         
-        public async Task<CartDto> CreateCartAsync(Guid companyGuid, CartDto cartDto)
+        public async Task<CartCache> CreateCartAsync(Guid companyGuid)
         {
             var company = await _companyService.GetByGuidAsync(companyGuid);
             if (company == null) throw new Exception("Company not found.");
-            var invoice = company.Invoices.FirstOrDefault(i => i.GuidId == cartDto.InvoiceId);
-            if (invoice == null) throw new Exception("Invoice not found in the specified company.");
 
-            return await _cartService.CreateCartAsync(companyGuid, cartDto);
+            return await _cartRepository.GetCartCacheAsync(companyGuid);
         }
 
-        public async Task<CartDto> UpdateCartAsync(Guid companyGuid, CartDto cartDto)
+        public async Task UpdateCartAsync(CartCache cart)
         {
-            var company = await _companyService.GetByGuidAsync(companyGuid);
-            if (company == null) throw new Exception("Company not found.");
-            var invoice = company.Invoices.FirstOrDefault(i => i.GuidId == cartDto.InvoiceId);
-            if (invoice == null) throw new Exception("Invoice not found in the specified company.");
-
-            return await _cartService.UpdateCartAsync(companyGuid, cartDto);
+            await _cartRepository.SaveCartCache(cart);
         }
 
-        public async Task<bool> DeleteCartAsync(Guid companyGuid)
+        public async Task DeleteCartAsync(Guid companyGuid)
         {
-            var company = await _companyService.GetByGuidAsync(companyGuid);
-            if (company == null) throw new Exception("Company not found.");
-
-            return await _cartService.DeleteCartAsync(companyGuid);
+            await _cartRepository.DeleteCartCache(companyGuid);
         }
 
     }

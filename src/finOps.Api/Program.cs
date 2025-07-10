@@ -1,11 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using finOps.Infra.Persistence.EF;
 using StackExchange.Redis;
-using finOps.Application.Interfaces;
 using finOps.Infra.Cache.Repositories;
-using finOps.Core.Entities;
-using FluentValidation;
-using FluentValidation.AspNetCore;
+using finOps.Application.Interfaces.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,9 +17,10 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddControllers()
-    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<CompanyValidator>())
-    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<InvoiceValidator>());
+//builder.Services.AddControllers()
+//    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<CompanyValidator>())
+//    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<InvoiceValidator>());
+builder.Services.AddControllers();
 
 var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL")
     ?? builder.Configuration.GetConnectionString("DefaultConnection");
@@ -58,8 +56,6 @@ if (app.Environment.IsDevelopment())
 app.UsePathBase("/api/v1/finops");
 app.UseRouting();
 app.UseHttpsRedirection();
-
-app.MapGet("/", () => "FinOps API is running!");
 
 await app.RunAsync();
 
